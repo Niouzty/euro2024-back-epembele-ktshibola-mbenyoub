@@ -1,4 +1,3 @@
-# euro2024-back-epembele-ktshibola-mbenyoub
 # Projet Semestre 4 - Interface d'Administration de Données
 
 ## Contexte du Projet
