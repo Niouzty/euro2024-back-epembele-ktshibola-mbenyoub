@@ -1,14 +1,13 @@
-from flask import Flask, jsonify, request, Blueprint
-
-from controllers.equipe_controller import equipe_controller
-from controllers.rencontre_controller import rencontre_controller
+from flask import Flask, jsonify
+from controllers.test_controller import test_controller  
 
 app = Flask(__name__)
 
-app.register_blueprint(equipe_controller)
-app.register_blueprint(rencontre_controller)
+@app.route("/")
+def home():
+    return jsonify({"message": "Bienvenue sur l'API Euro 2024"}), 200
 
-
+app.register_blueprint(test_controller)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)  
