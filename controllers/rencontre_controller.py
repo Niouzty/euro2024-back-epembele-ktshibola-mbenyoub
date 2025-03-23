@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, Response
 from services.rencontre_service import RencontreService
 
-rencontre_controller = Blueprint('match', __name__, url_prefix='/match')
+rencontre_controller = Blueprint('matchs', __name__, url_prefix='/matchs')
 
 @rencontre_controller.route('/', methods=['POST'])
 def add_rencontre() -> tuple[Response, int]:
@@ -9,20 +9,20 @@ def add_rencontre() -> tuple[Response, int]:
     if not data:
         return jsonify({"message": "Données invalides."}), 400
     
-    score_final = data.get('Score_Final')
-    phase_tournoi = data.get('Phase_Tournoi')
-    date = data.get('Date')
-    id_stade = data.get('Id_Stade')
-    id_equipe = data.get('Id_Equipe')
-    id_equipe_equipeB = data.get('Id_Equipe_EquipeB')
+    score_final = data.get('score_Final')
+    phase_tournoi = data.get('phase_Tournoi')
+    date = data.get('date')
+    id_stade = data.get('id_stade')
+    id_equipe = data.get('id_equipe')
+    id_equipe_equipeb = data.get('id_equipe_equipeb')
     
-    success = RencontreService.add_rencontre(score_final, phase_tournoi, date, id_stade, id_equipe, id_equipe_equipeB)
+    success = RencontreService.add_rencontre(score_final, phase_tournoi, date, id_stade, id_equipe, id_equipe_equipeb)
     if success:
         return jsonify({"message": "Rencontre ajoutée avec succès."}), 201
     return jsonify({"message": "Erreur lors de l'ajout de la rencontre."}), 500
 
 @rencontre_controller.route('/<int:id_match>', methods=['DELETE'])
-def delete_rencontre(id_match):
+def delete_rencontre(id_match) -> tuple[Response, int]:
     success = RencontreService.delete_rencontre(id_match)
     if success:
         return jsonify({"message": "Rencontre supprimée avec succès."}), 200
@@ -38,4 +38,4 @@ def get_rencontre(id_match) -> tuple[Response, int]:
 @rencontre_controller.route('/', methods=['GET'])
 def get_all_rencontres() -> tuple[Response, int]:
     rencontres = RencontreService.get_all_rencontres()
-    return jsonify(rencontres), 200
+    return jsonify({"message": "Rencontres récupérées avec succès.", "data": rencontres}), 200

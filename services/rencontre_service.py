@@ -39,7 +39,7 @@ class RencontreService:
             connection.close()
 
     @staticmethod
-    def get_rencontre(id_match):
+    def get_rencontre(id_match) -> dict | None:
         connection = get_db_connection()
         if not connection:
             return None
@@ -56,7 +56,7 @@ class RencontreService:
             connection.close()
 
     @staticmethod
-    def get_all_rencontres():
+    def get_all_rencontres() -> list[dict]:
         connection = get_db_connection()
         if not connection:
             return []
