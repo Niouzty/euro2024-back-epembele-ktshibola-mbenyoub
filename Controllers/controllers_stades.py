@@ -64,3 +64,56 @@ def get_nombres_stades():
 def get_visitors_stades_lenght():
     stade_taille = services_stades.get_stade_visitor()
     return jsonify({"result": stade_taille}), 200
+
+
+@stade_controllers.route('/<int:stade_id>', methods=['PATCH'])
+def update_stade(stade_id):
+    data = request.json
+
+    if not data:
+        return jsonify({"error": "Aucune donnée fournie"}), 400
+
+    column, value = data.get("column"), data.get("value")
+
+    if not column or value is None:
+        return jsonify({"error": "Champs manquant"}), 400
+
+    valid_columns = {"nom", "ville", "capacite"}
+
+    if column not in valid_columns:
+        return jsonify({"error": f"Colonne '{column}' non autorisée"}), 400
+
+    success = services_stades.update_stade(stade_id, column, value)
+
+    if not success:
+        return jsonify({"error": "Erreur lors de la mise à jour du stade"}), 500
+
+    return jsonify({"message": "Stade mis à jour avec succès"}), 200
+
+
+@stade_controllers.route('/batch', methods=['POST'])
+def insert():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "Aucune donnée fournie"}), 400
+
+    stades = data.get("stades")
+
+    if not isinstance(stades, list):
+        return jsonify({"error": "Le champ 'stades' doit être une liste"}), 400
+
+    failed_insert = services_stades.insert_stade(stades)
+    success_count = len(stades) - len(failed_insert)
+
+    if len(failed_insert) == 0:
+        return jsonify({"result": f"{success_count} stades insérés"}), 200
+
+    if len(failed_insert) < len(stades):
+        return jsonify({
+            "result": f"{success_count} stades insérés, {len(failed_insert)} erreurs",
+            "error": failed_insert
+        }), 207
+
+
+    return jsonify({"error": f"0/{len(stades)} insert","rows":failed_insert}),400
