@@ -1,4 +1,6 @@
 from datetime import date
+
+from Modeles.Rencontre import Rencontre
 from Services.BD import BD
 from Modeles.Stade import Stade
 class StadeService:

@@ -44,3 +44,27 @@ class services_database:
         except mysql.connector.Error as e:
             print(f"Erreur MySQL : {e}")
             return []
+
+
+
+    def get_table(self,table_name):
+        query = """
+        SELECT TABLE_NAME, COLUMN_NAME 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_SCHEMA = 'bd_euro_2024' and TABLE_NAME = %s;
+        """
+
+        try:
+            self.cursor.execute(query, (table_name,))
+            results = self.cursor.fetchall()
+
+            tables_dict = None
+            table_name, column_name = row['TABLE_NAME'], row['COLUMN_NAME']
+
+            tables_dict[table_name].append(column_name)
+
+            return
+
+        except mysql.connector.Error as e:
+            print(f"Erreur MySQL : {e}")
+            return []
