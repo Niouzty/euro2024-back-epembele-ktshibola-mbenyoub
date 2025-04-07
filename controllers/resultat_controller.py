@@ -37,3 +37,5 @@ def get_all_resultats() -> tuple[Response, int]:
     if resultats:
         return jsonify(resultats), 200
     return jsonify({"message": "Aucun résultat trouvé."}), 404
+
+

@@ -1,4 +1,4 @@
-from utils.db_connection import get_db_connection
+from utilsp.db_connection import get_db_connection
 
 class NationaliteService:
 

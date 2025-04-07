@@ -1,4 +1,4 @@
-from utils.db_connection import get_db_connection
+from utilsp.db_connection import get_db_connection
 
 class EquipeService:
 
@@ -92,3 +92,47 @@ class EquipeService:
             return [] 
         finally:
             connection.close()  
+
+    @staticmethod
+    def get_all_result_by_equipe(id_equipe) -> list[dict]:
+        connection = get_db_connection()
+        if not connection:
+            return []
+    
+        try:
+            with connection.cursor() as cursor:
+                sql = """
+                    SELECT 
+    e.nom AS equipe,
+    COUNT(r.id_match) AS nombre_de_matchs,
+    COALESCE(SUM(
+        CASE 
+            WHEN r.id_equipe1 = e.id_equipe THEN res.buts_equipe1_temps_reglementaire
+            ELSE res.buts_equipe2_temps_reglementaire
+        END
+    ), 0) AS buts_temps_reglementaire,
+    COALESCE(SUM(
+        CASE 
+            WHEN r.id_equipe1 = e.id_equipe THEN res.buts_equipe1_apres_prolongation
+            ELSE res.buts_equipe2_apres_prolongation
+        END
+    ), 0) AS buts_apres_prolongation,
+    COALESCE(SUM(
+        CASE 
+            WHEN r.id_equipe1 = e.id_equipe THEN res.score_tirs_au_but_equipe1
+            ELSE res.score_tirs_au_but_equipe2
+        END
+    ), 0) AS buts_tirs_au_but
+FROM equipe e
+LEFT JOIN rencontre r ON e.id_equipe = r.id_equipe1 OR e.id_equipe = r.id_equipe2
+LEFT JOIN resultat res ON r.id_resultat = res.id_resultat
+WHERE e.id_equipe = %s
+GROUP BY e.nom;
+                """
+                cursor.execute(sql, (id_equipe,))
+                return cursor.fetchall()
+        except Exception as e:
+            print(f"Erreur SQL: {str(e)}")
+            return []
+        finally:
+            connection.close()

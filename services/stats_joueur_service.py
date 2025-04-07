@@ -1,4 +1,4 @@
-from utils.db_connection import get_db_connection
+from shared.db_connection import get_db_connection
 
 class StatsJoueurService:
 
@@ -68,5 +68,21 @@ class StatsJoueurService:
         except Exception as e:
             print(f"Erreur lors de la récupération des statistiques des joueurs : {e}")
             return []
+        finally:
+            connection.close()
+
+    @staticmethod
+    def get_top_butteurs() -> list[dict]:
+        connection = get_db_connection()
+        if not connection:
+            return[]
+        try:
+            with connection.cursor() as cursor:
+                sql = "SELECT * from joueur join stats_joueur using(id_stats_joueur) ORDER by buts_marques desc;"
+                cursor.execute(sql)
+                return cursor.fetchall()
+        except Exception as e:
+            print(f"Erreur lors de la récupération des joueurs : {e}")
+            return[]
         finally:
             connection.close()

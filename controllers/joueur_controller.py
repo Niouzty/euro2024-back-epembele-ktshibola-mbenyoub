@@ -30,6 +30,7 @@ def get_joueur(id_joueur: int) -> tuple[Response, int]:
         return jsonify(joueur), 200
     return jsonify({"message": "Joueur non trouvé."}), 404
 
+
 @joueur_controller.route('/', methods=['GET'])
 def get_all_joueurs() -> tuple[Response, int]:
     joueurs = JoueurService.get_all_joueurs()

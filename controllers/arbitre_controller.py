@@ -30,5 +30,13 @@ def get_arbitre(id_arbitre: int) -> tuple[Response, int]:
 def get_all_arbitres() -> tuple[Response, int]:
     arbitres = ArbitreService.get_all_arbitres()
     if arbitres:
+        print(arbitres)
         return jsonify(arbitres), 200
     return jsonify({"message": "Aucun arbitre trouvé."}), 404
+
+@arbitre_controller.route('/arbitre-result', methods=['GET'])
+def get_all_result() -> tuple[Response, int]:
+    arbitre = ArbitreService.get_all_result()
+    if arbitre:
+        return jsonify(arbitre), 
+    return jsonify({"messge": "Arbitre nonn trouvé"}), 404

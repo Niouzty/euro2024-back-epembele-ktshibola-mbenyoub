@@ -1,19 +1,30 @@
 
 
 class Rencontre:
-    def __init__(self, id_rencontre: int, id_phase: int, date: str, id_stade: int):
-        self.id_rencontre = id_rencontre
-        self.id_phase = id_phase
-        self.date = date
+    def __init__(self, id_match: int, id_temps: int, id_stade: int, id_equipe1: int, id_equipe2: int, id_arbitre: int, id_phase: int, id_resultat: int | None = None, nb_spectateurs: int | None = None):
+        self.id_match = id_match
+        self.id_temps = id_temps
         self.id_stade = id_stade
-
+        self.id_equipe1 = id_equipe1
+        self.id_equipe2 = id_equipe2
+        self.id_arbitre = id_arbitre
+        self.id_phase = id_phase
+        self.id_resultat = id_resultat
+        self.nb_spectateurs = nb_spectateurs
+   
     def to_dict(self):
         return {
-            "id_rencontre": self.id_rencontre,
+            "id_match": self.id_match,
+            "id_temps": self.id_temps,
+            "id_stade": self.id_stade,
+            "id_equipe1": self.id_equipe1,
+            "id_equipe2": self.id_equipe2,
+            "id_arbitre": self.id_arbitre,
             "id_phase": self.id_phase,
-            "date": self.date,
-            "id_stade": self.id_stade
+            "id_resultat": self.id_resultat,
+            "nb_spectateurs": self.nb_spectateurs
         }
 
+
     def __lt__(self, other):
-        return self.date < other.date
+        return self.id_temps < other.id_temps

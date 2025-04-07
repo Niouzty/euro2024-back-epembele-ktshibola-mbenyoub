@@ -1,32 +1,86 @@
-from flask import Blueprint, jsonify, request, Response
-from services.ville_service import VilleService
+from shared.db_connection import get_db_connection
 
-ville_controller = Blueprint('villes', __name__, url_prefix='/villes')
+class VilleService:
 
-@ville_controller.route('/', methods=['POST'])
-def add_ville() -> tuple[Response, int]:
-    data = request.get_json()
-    nom = data.get('nom')
-    VilleService.add_ville(nom)
-    return jsonify(data), 201
+    @staticmethod
+    def add_ville(nom: str) -> bool:
+        connection = get_db_connection()
+        if not connection:
+            return False
+        try:
+            with connection.cursor() as cursor:
+                sql = "INSERT INTO ville (nom) VALUES (%s)"
+                cursor.execute(sql, (nom,))
+                connection.commit()
+                return True
+        except Exception as e:
+            print(f"Erreur lors de l'ajout de la ville : {e}")
+            return False
+        finally:
+            connection.close()
 
-@ville_controller.route('/<int:id_ville>', methods=['DELETE'])
-def delete_ville(id_ville) -> tuple[Response, int]:
-    success = VilleService.delete_ville(id_ville)
-    if success:
-        return jsonify({"message": "La ville a été supprimée avec succès."}), 200
-    return jsonify({"message": "La suppression de la ville a échoué."}), 400
+    @staticmethod
+    def delete_ville(id_ville: int) -> bool:
+        connection = get_db_connection()
+        if not connection:
+            return False
+        try:
+            with connection.cursor() as cursor:
+                sql = "DELETE FROM ville WHERE id_ville = %s"
+                cursor.execute(sql, (id_ville,))
+                connection.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Erreur lors de la suppression de la ville : {e}")
+            return False
+        finally:
+            connection.close()
 
-@ville_controller.route('/<int:id_ville>', methods=['GET'])
-def get_ville(id_ville: int) -> tuple[Response, int]:
-    ville = VilleService.get_ville(id_ville)
-    if ville:
-        return jsonify(ville), 200
-    return jsonify({"message": "Ville non trouvée."}), 404
+    @staticmethod
+    def get_ville(id_ville: int) -> dict | None:
+        connection = get_db_connection()
+        if not connection:
+            return None
+        try:
+            with connection.cursor() as cursor:
+                sql = "SELECT * FROM ville WHERE id_ville = %s"
+                cursor.execute(sql, (id_ville,))
+                return cursor.fetchone()
+        except Exception as e:
+            print(f"Erreur lors de la récupération de la ville : {e}")
+            return None
+        finally:
+            connection.close()
 
-@ville_controller.route('/', methods=['GET'])
-def get_all_villes() -> tuple[Response, int]:
-    villes = VilleService.get_all_villes()
-    if villes:
-        return jsonify(villes), 200
-    return jsonify({"message": "Aucune ville trouvée."}), 404
+    @staticmethod
+    def get_all_villes() -> list[dict]:
+        connection = get_db_connection()
+        if not connection:
+            return []
+        try:
+            with connection.cursor() as cursor:
+                sql = "SELECT * FROM ville"
+                cursor.execute(sql)
+                return cursor.fetchall()
+        except Exception as e:
+            print(f"Erreur lors de la récupération des villes : {e}")
+            return []
+        finally:
+            connection.close()
+
+    @staticmethod
+    def update_ville(id_ville: int, new_nom: str) -> bool:
+        connection = get_db_connection()
+        if not connection:
+            return False
+        try:
+            with connection.cursor() as cursor:
+                sql = "UPDATE ville SET nom = %s WHERE id_ville = %s"
+                cursor.execute(sql, (new_nom, id_ville))
+                connection.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour de la ville : {e}")
+            return False
+        finally:
+            connection.close()

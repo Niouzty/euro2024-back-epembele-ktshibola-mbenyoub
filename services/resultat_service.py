@@ -1,4 +1,4 @@
-from utils.db_connection import get_db_connection
+from shared.db_connection import get_db_connection
 
 class ResultatService:
 
@@ -70,3 +70,6 @@ class ResultatService:
             return []
         finally:
             connection.close()
+
+
+    

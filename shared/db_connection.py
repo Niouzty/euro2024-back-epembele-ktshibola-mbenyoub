@@ -10,7 +10,11 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Vérification des variables d'environnement
-required_env_vars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"]
+
+#si on veut qu'il y ait un mot de passe 
+#required_env_vars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"]
+required_env_vars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_NAME"]
+
 for var in required_env_vars:
     if not os.getenv(var):
         raise ValueError(f"La variable d'environnement {var} est manquante.")
@@ -20,7 +24,7 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST"),
     "port": int(os.getenv("DB_PORT")),
     "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
+    "password": os.getenv("DB_PASSWORD", ""),  # <-- Accepte les valeurs vides
     "db": os.getenv("DB_NAME"),
     "charset": "utf8mb4",
     "cursorclass": pymysql.cursors.DictCursor,

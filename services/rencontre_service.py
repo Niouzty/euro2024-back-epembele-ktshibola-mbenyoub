@@ -1,4 +1,4 @@
-from utils.db_connection import get_db_connection
+from shared.db_connection import get_db_connection
 
 class RencontreService:
     @staticmethod
@@ -71,3 +71,5 @@ class RencontreService:
             return []
         finally:
             connection.close()
+
+    

@@ -34,3 +34,10 @@ def get_all_stats_joueurs() -> tuple[Response, int]:
     if stats_joueurs:
         return jsonify(stats_joueurs), 200
     return jsonify({"message": "Aucune statistique de joueur trouvée."}), 404
+
+@stats_joueur_controller.route('/top-buteurs', methods=['GET'])
+def get_top_joueur() -> tuple [Response, int]:
+    stats_joueurs = StatsJoueurService.get_top_butteurs()
+    if stats_joueurs:
+        return jsonify(stats_joueurs), 200
+    return jsonify({"message": "Aucun joueur trouvé."}), 404
