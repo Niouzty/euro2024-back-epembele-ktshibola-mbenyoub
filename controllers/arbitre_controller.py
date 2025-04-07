@@ -1,42 +1,84 @@
-from flask import Blueprint, jsonify, request, Response
-from services.arbitre_service import ArbitreService
+from shared.db_connection import get_db_connection
 
-arbitre_controller = Blueprint('arbitres', __name__, url_prefix='/arbitres')
+class ArbitreService:
 
-@arbitre_controller.route('/', methods=['POST'])
-def add_arbitre() -> tuple[Response, int]:
-    data = request.get_json()
-    nom = data.get('nom')
-    prenom = data.get('prenom')
-    id_nationalite = data.get('id_nationalite')
-    ArbitreService.add_arbitre(nom, prenom, id_nationalite)
-    return jsonify(data), 201
+    @staticmethod
+    def add_arbitre(nom: str, prenom: str, id_nationalite: int) -> bool:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Connexion à la base échouée.")
+        try:
+            with connection.cursor() as cursor:
+                sql = "INSERT INTO arbitre (nom, prenom, id_nationalite) VALUES (%s, %s, %s)"
+                cursor.execute(sql, (nom, prenom, id_nationalite))
+                connection.commit()
+                return True
+        finally:
+            connection.close()
 
-@arbitre_controller.route('/<int:id_arbitre>', methods=['DELETE'])
-def delete_arbitre(id_arbitre) -> tuple[Response, int]:
-    success = ArbitreService.delete_arbitre(id_arbitre)
-    if success:
-        return jsonify({"message": "L'arbitre a été supprimé avec succès."}), 200
-    return jsonify({"message": "La suppression de l'arbitre a échoué."}), 400
+    @staticmethod
+    def delete_arbitre(id_arbitre: int) -> int:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Connexion à la base échouée.")
+        try:
+            with connection.cursor() as cursor:
+                sql = "DELETE FROM arbitre WHERE id_arbitre = %s"
+                cursor.execute(sql, (id_arbitre,))
+                connection.commit()
+                return cursor.rowcount
+        finally:
+            connection.close()
 
-@arbitre_controller.route('/<int:id_arbitre>', methods=['GET'])
-def get_arbitre(id_arbitre: int) -> tuple[Response, int]:
-    arbitre = ArbitreService.get_arbitre(id_arbitre)
-    if arbitre:
-        return jsonify(arbitre), 200
-    return jsonify({"message": "Arbitre non trouvé."}), 404
+    @staticmethod
+    def get_arbitre(id_arbitre: int) -> dict | None:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Connexion à la base échouée.")
+        try:
+            with connection.cursor() as cursor:
+                sql = "SELECT * FROM arbitre WHERE id_arbitre = %s"
+                cursor.execute(sql, (id_arbitre,))
+                return cursor.fetchone()
+        finally:
+            connection.close()
 
-@arbitre_controller.route('/', methods=['GET'])
-def get_all_arbitres() -> tuple[Response, int]:
-    arbitres = ArbitreService.get_all_arbitres()
-    if arbitres:
-        print(arbitres)
-        return jsonify(arbitres), 200
-    return jsonify({"message": "Aucun arbitre trouvé."}), 404
+    @staticmethod
+    def get_all_arbitres() -> list[dict]:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Connexion à la base échouée.")
+        try:
+            with connection.cursor() as cursor:
+                sql = "SELECT * FROM arbitre"
+                cursor.execute(sql)
+                return cursor.fetchall()
+        finally:
+            connection.close()
 
-@arbitre_controller.route('/arbitre-result', methods=['GET'])
-def get_all_result() -> tuple[Response, int]:
-    arbitre = ArbitreService.get_all_result()
-    if arbitre:
-        return jsonify(arbitre), 
-    return jsonify({"messge": "Arbitre nonn trouvé"}), 404
+    @staticmethod
+    def get_all_result_by_id(id_arbitre: int) -> list[dict]:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Connexion à la base échouée.")
+        try:
+            with connection.cursor() as cursor:
+                sql = """
+                    SELECT
+                        a.id_arbitre,
+                        a.nom, 
+                        a.prenom, 
+                        COUNT(DISTINCT r.id_match) AS nombre_de_matchs,
+                        COUNT(c.id_carton) AS nombre_de_cartons,
+                        COALESCE(SUM(CASE WHEN c.type_carton = 'jaune' THEN 1 ELSE 0 END), 0) AS cartons_jaunes,
+                        COALESCE(SUM(CASE WHEN c.type_carton = 'rouge' THEN 1 ELSE 0 END), 0) AS cartons_rouges
+                    FROM arbitre a
+                    LEFT JOIN rencontre r ON a.id_arbitre = r.id_arbitre
+                    LEFT JOIN carton c ON r.id_match = c.id_match AND a.id_arbitre = c.id_arbitre
+                    WHERE a.id_arbitre = %s
+                    GROUP BY a.id_arbitre, a.nom, a.prenom;
+                """
+                cursor.execute(sql, (id_arbitre,))
+                return cursor.fetchall()
+        finally:
+            connection.close()

@@ -17,3 +17,8 @@ def test_db():
     finally:
         if connection: 
             connection.close()
+
+
+@database_controller.route("/", methods=["GET"])
+def get_tables():
+    pass
