@@ -3,30 +3,57 @@ from services.ville_service import VilleService
 
 ville_controller = Blueprint('villes', __name__, url_prefix='/villes')
 
+
+# ➕ Ajouter une ville
 @ville_controller.route('/', methods=['POST'])
 def add_ville() -> tuple[Response, int]:
-    data = request.get_json()
-    nom = data.get('nom')
-    VilleService.add_ville(nom)
-    return jsonify(data), 201
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Données JSON manquantes ou invalides."}), 400
 
+        nom = data.get('nom')
+        if not nom:
+            return jsonify({"error": "Le champ 'nom' est requis."}), 400
+
+        VilleService.add_ville(nom)
+        return jsonify({"message": "Ville ajoutée avec succès."}), 201
+
+    except Exception as e:
+        return jsonify({"error": f"Erreur interne lors de l'ajout de la ville. {e}"}), 500
+
+
+# ❌ Supprimer une ville par ID
 @ville_controller.route('/<int:id_ville>', methods=['DELETE'])
-def delete_ville(id_ville) -> tuple[Response, int]:
-    success = VilleService.delete_ville(id_ville)
-    if success:
-        return jsonify({"message": "La ville a été supprimée avec succès."}), 200
-    return jsonify({"message": "La suppression de la ville a échoué."}), 400
+def delete_ville(id_ville: int) -> tuple[Response, int]:
+    try:
+        success = VilleService.delete_ville(id_ville)
+        if success:
+            return jsonify({"message": "La ville a été supprimée avec succès."}), 200
+        return jsonify({"error": "Suppression échouée. La ville n'existe peut-être pas."}), 404
+    except Exception as e:
+        return jsonify({"error": f"Erreur interne lors de la suppression de la ville. {e}"}), 500
 
+
+# 🔍 Obtenir une ville par son ID
 @ville_controller.route('/<int:id_ville>', methods=['GET'])
 def get_ville(id_ville: int) -> tuple[Response, int]:
-    ville = VilleService.get_ville(id_ville)
-    if ville:
-        return jsonify(ville), 200
-    return jsonify({"message": "Ville non trouvée."}), 404
+    try:
+        ville = VilleService.get_ville(id_ville)
+        if ville:
+            return jsonify(ville), 200
+        return jsonify({"error": "Ville non trouvée."}), 404
+    except Exception as e:
+        return jsonify({"error": f"Erreur interne lors de la récupération de la ville. {e}"}), 500
 
+
+# 📄 Obtenir la liste de toutes les villes
 @ville_controller.route('/', methods=['GET'])
 def get_all_villes() -> tuple[Response, int]:
-    villes = VilleService.get_all_villes()
-    if villes:
-        return jsonify(villes), 200
-    return jsonify({"message": "Aucune ville trouvée."}), 404
+    try:
+        villes = VilleService.get_all_villes()
+        if villes:
+            return jsonify(villes), 200
+        return jsonify({"error": "Aucune ville trouvée."}), 404
+    except Exception as e:
+        return jsonify({"error": f"Erreur interne lors de la récupération des villes. {e}"}), 500

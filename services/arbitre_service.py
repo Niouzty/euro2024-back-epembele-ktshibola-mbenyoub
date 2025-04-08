@@ -1,5 +1,6 @@
 from shared.db_connection import get_db_connection
 
+
 class ArbitreService:
 
     @staticmethod
