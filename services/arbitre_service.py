@@ -6,6 +6,8 @@ class ArbitreService:
     @staticmethod
     def add_arbitre(nom: str, prenom: str, id_nationalite: int) -> bool:
         connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = "INSERT INTO arbitre (nom, prenom, id_nationalite) VALUES (%s, %s, %s)"
             cursor.execute(sql, (nom, prenom, id_nationalite))
@@ -15,6 +17,8 @@ class ArbitreService:
     @staticmethod
     def delete_arbitre(id_arbitre: int) -> bool:
         connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = "DELETE FROM arbitre WHERE id_arbitre = %s"
             cursor.execute(sql, (id_arbitre,))
@@ -24,6 +28,8 @@ class ArbitreService:
     @staticmethod
     def get_arbitre(id_arbitre: int) -> dict | None:
         connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM arbitre WHERE id_arbitre = %s"
             cursor.execute(sql, (id_arbitre,))
@@ -32,6 +38,8 @@ class ArbitreService:
     @staticmethod
     def get_all_arbitres() -> list[dict]:
         connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM arbitre"
             cursor.execute(sql)
@@ -40,6 +48,10 @@ class ArbitreService:
     @staticmethod
     def get_all_result() -> list[dict]:
         connection = get_db_connection()
+
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
+
         with connection.cursor() as cursor:
             sql = """
                 SELECT
