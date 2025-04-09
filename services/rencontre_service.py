@@ -1,3 +1,4 @@
+from models.rencontre_model import Rencontre
 from shared.db_connection import get_db_connection
 
 class RencontreService:
@@ -28,21 +29,23 @@ class RencontreService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_rencontre(id_match) -> dict | None:
+    def get_rencontre(id_match) -> Rencontre | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM Rencontre WHERE Id_Match = %s"
             cursor.execute(sql, (id_match,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Rencontre(**result) if result else None
 
     @staticmethod
-    def get_all_rencontres() -> list[dict]:
+    def get_all_rencontres() -> list[Rencontre]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM Rencontre"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Rencontre(**row) for row in result]

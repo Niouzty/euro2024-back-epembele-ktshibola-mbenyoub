@@ -1,4 +1,5 @@
-from utils.db_connection import get_db_connection
+from models.poste_model import Poste
+from shared.db_connection import get_db_connection
 
 class PosteService:
 
@@ -25,21 +26,23 @@ class PosteService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_poste(id_poste: int) -> dict | None:
+    def get_poste(id_poste: int) -> Poste | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM poste WHERE id_poste = %s"
             cursor.execute(sql, (id_poste,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Poste(**result) if result else None
 
     @staticmethod
-    def get_all_postes() -> list[dict]:
+    def get_all_postes() -> list[Poste]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM poste"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Poste(**row) for row in result]

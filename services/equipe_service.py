@@ -1,4 +1,7 @@
-from utilsp.db_connection import get_db_connection
+from typing import List
+
+from models.equipe_model import Equipe
+from shared.db_connection import get_db_connection
 
 class EquipeService:
 
@@ -27,7 +30,7 @@ class EquipeService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_equipe(id_equipe: int) -> dict | None:
+    def get_equipe(id_equipe: int) -> Equipe | None:
         connection = get_db_connection()
 
         if not connection:
@@ -35,10 +38,11 @@ class EquipeService:
         with connection.cursor() as cursor:
             sql = "SELECT * FROM equipe WHERE id_equipe = %s"
             cursor.execute(sql, (id_equipe,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Equipe(**result) if result else None
 
     @staticmethod
-    def get_all_equipes() -> list[dict]:
+    def get_all_equipes() -> list[Equipe]:
         connection = get_db_connection()
 
         if not connection:
@@ -46,10 +50,11 @@ class EquipeService:
         with connection.cursor() as cursor:
             sql = "SELECT * FROM equipe"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Equipe(**row) for row in result]
 
     @staticmethod
-    def get_equipes_by_groupe(id_groupe: str) -> list[dict]:
+    def get_equipes_by_groupe(id_groupe: str) -> list[Equipe]:
         connection = get_db_connection()
 
         if not connection:
@@ -57,7 +62,8 @@ class EquipeService:
         with connection.cursor() as cursor:
             sql = "SELECT * FROM equipe WHERE groupe = %s"
             cursor.execute(sql, (id_groupe,))
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Equipe(**row) for row in result]
 
     @staticmethod
     def get_all_result_by_equipe(id_equipe) -> list[dict]:

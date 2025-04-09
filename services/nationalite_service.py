@@ -1,5 +1,8 @@
 from utils.db_connection import get_db_connection
 
+from models.nationalite_model import Nationalite
+
+
 class NationaliteService:
 
     @staticmethod
@@ -25,21 +28,24 @@ class NationaliteService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_nationalite(id_nationalite: int) -> dict | None:
+    def get_nationalite(id_nationalite: int) -> Nationalite | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM nationalite WHERE id_nationalite = %s"
             cursor.execute(sql, (id_nationalite,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Nationalite(**result) if result else None
+
 
     @staticmethod
-    def get_all_nationalites() -> list[dict]:
+    def get_all_nationalites() -> list[Nationalite]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM nationalite"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Nationalite(**row) for row in result]

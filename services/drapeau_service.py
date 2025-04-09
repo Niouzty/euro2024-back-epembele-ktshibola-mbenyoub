@@ -1,4 +1,4 @@
-from utils.db_connection import get_db_connection
+from shared.db_connection import get_db_connection
 
 from models.drapeau_model import Drapeau
 
@@ -6,7 +6,7 @@ from models.drapeau_model import Drapeau
 class DrapeauService:
 
     @staticmethod
-    def add_drapeau(id_equipe: int, chemin_image: str) -> Drapeau:
+    def add_drapeau(id_equipe: int, chemin_image: str) -> bool:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
@@ -14,9 +14,8 @@ class DrapeauService:
         with connection.cursor() as cursor:
             sql = "INSERT INTO drapeau (id_equipe, chemin_image) VALUES (%s, %s) RETURNING id_drapeau"
             cursor.execute(sql, (id_equipe, chemin_image))
-            id_drapeau = cursor.fetchone()[0]
             connection.commit()
-            return Drapeau(id_drapeau, id_equipe, chemin_image)
+            return True
 
     @staticmethod
     def delete_drapeau(id_drapeau: int) -> int:
@@ -41,7 +40,7 @@ class DrapeauService:
             cursor.execute(sql, (id_drapeau,))
             row = cursor.fetchone()
             if row:
-                return Drapeau(*row)
+                return Drapeau(**row)
             return None
 
     @staticmethod
@@ -54,4 +53,4 @@ class DrapeauService:
             sql = "SELECT id_drapeau, id_equipe, chemin_image FROM drapeau"
             cursor.execute(sql)
             rows = cursor.fetchall()
-            return [Drapeau(*row) for row in rows]
+            return [Drapeau(**row) for row in rows]

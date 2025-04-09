@@ -1,4 +1,7 @@
-from utils.db_connection import get_db_connection
+from typing import List
+
+from models.groupe_model import Groupe
+from shared.db_connection import get_db_connection
 
 class GroupeService:
 
@@ -32,14 +35,16 @@ class GroupeService:
         with connection.cursor() as cursor:
             sql = "SELECT * FROM groupe WHERE id_groupe = %s"
             cursor.execute(sql, (id_groupe,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Groupe(**result) if result else None
 
     @staticmethod
-    def get_all_groupes() -> list[dict]:
+    def get_all_groupes() -> list[Groupe]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM groupe"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Groupe(**row) for row in result]

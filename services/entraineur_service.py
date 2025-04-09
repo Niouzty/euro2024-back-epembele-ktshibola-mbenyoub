@@ -1,4 +1,7 @@
-from utils.db_connection import get_db_connection
+from typing import List
+
+from models.entraineur_model import Entraineur
+from shared.db_connection import get_db_connection
 
 
 class EntraineurService:
@@ -24,11 +27,10 @@ class EntraineurService:
             sql = "DELETE FROM entraineur WHERE id_entraineur = %s"
             cursor.execute(sql, (id_entraineur,))
             connection.commit()
-            connection.close()
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_entraineur(id_entraineur: int) -> dict | None:
+    def get_entraineur(id_entraineur: int) -> Entraineur:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
@@ -36,11 +38,10 @@ class EntraineurService:
             sql = "SELECT * FROM entraineur WHERE id_entraineur = %s"
             cursor.execute(sql, (id_entraineur,))
             result = cursor.fetchone()
-            connection.close()
-            return result
+            return Entraineur(**result) if result else None
 
     @staticmethod
-    def get_all_entraineurs() -> list[dict]:
+    def get_all_entraineurs() -> list[Entraineur]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
@@ -48,5 +49,4 @@ class EntraineurService:
             sql = "SELECT * FROM entraineur"
             cursor.execute(sql)
             result = cursor.fetchall()
-            connection.close()
-            return result
+            return [Entraineur(**row) for row in result]

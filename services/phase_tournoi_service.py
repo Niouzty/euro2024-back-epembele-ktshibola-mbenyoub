@@ -1,4 +1,5 @@
-from utils.db_connection import get_db_connection
+from models.phase_tournoi_model import PhaseTournoi
+from shared.db_connection import get_db_connection
 
 class PhaseTournoiService:
 
@@ -25,21 +26,23 @@ class PhaseTournoiService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_phase_tournoi(id_phase: int) -> dict | None:
+    def get_phase_tournoi(id_phase: int) -> PhaseTournoi | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM phase_tournoi WHERE id_phase = %s"
             cursor.execute(sql, (id_phase,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return PhaseTournoi(**result) if result else None
 
     @staticmethod
-    def get_all_phases_tournoi() -> list[dict]:
+    def get_all_phases_tournoi() -> list[PhaseTournoi]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM phase_tournoi"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [PhaseTournoi(**row) for row in result]

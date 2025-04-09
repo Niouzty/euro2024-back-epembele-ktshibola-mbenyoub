@@ -1,3 +1,6 @@
+from typing import List
+
+from models.arbitre_model import Arbitre
 from shared.db_connection import get_db_connection
 
 
@@ -26,24 +29,26 @@ class ArbitreService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_arbitre(id_arbitre: int) -> dict | None:
+    def get_arbitre(id_arbitre: int) -> Arbitre | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM arbitre WHERE id_arbitre = %s"
             cursor.execute(sql, (id_arbitre,))
-            return cursor.fetchone()
+            row = cursor.fetchone()
+            return Arbitre(**row) if row else None
 
     @staticmethod
-    def get_all_arbitres() -> list[dict]:
+    def get_all_arbitres() -> list[Arbitre]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM arbitre"
             cursor.execute(sql)
-            return cursor.fetchall()
+            rows = cursor.fetchall()
+            return [Arbitre(**row) for row in rows]
 
     @staticmethod
     def get_all_result() -> list[dict]:

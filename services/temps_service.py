@@ -1,3 +1,4 @@
+from models.temps_model import Temps
 from shared.db_connection import get_db_connection
 
 class TempsService:
@@ -25,21 +26,23 @@ class TempsService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_temps(id_temps: int) -> dict | None:
+    def get_temps(id_temps: int) -> Temps | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM temps WHERE id_temps = %s"
             cursor.execute(sql, (id_temps,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Temps(**result) if result else None
 
     @staticmethod
-    def get_all_temps() -> list[dict]:
+    def get_all_temps() -> list[Temps]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM temps"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Temps(**row) for row in result]

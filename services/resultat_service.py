@@ -1,3 +1,6 @@
+from typing import List
+
+from models.resultat_model import Resultat
 from shared.db_connection import get_db_connection
 
 class ResultatService:
@@ -28,21 +31,23 @@ class ResultatService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_resultat(id_resultat: int) -> dict | None:
+    def get_resultat(id_resultat: int) -> Resultat | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM resultat WHERE id_resultat = %s"
             cursor.execute(sql, (id_resultat,))
-            return cursor.fetchone()
+            result =  cursor.fetchone()
+            return Resultat(**result) if result else None
 
     @staticmethod
-    def get_all_resultats() -> list[dict]:
+    def get_all_resultats() -> list[Resultat]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM resultat"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Resultat(**row) for row in result]

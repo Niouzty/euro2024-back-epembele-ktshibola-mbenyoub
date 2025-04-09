@@ -1,24 +1,29 @@
 from flask import Blueprint, jsonify
-import utilsp.db_connection
 
-database_controller = Blueprint("database", __name__, url_prefix='/database')
+from services.database_service import ServicesDatabase
 
-@database_controller.route("/", methods=["GET"])
-def test_db():
-    connection = None  
-    try:
-        connection = utilsp.db_connection.get_db_connection() 
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * from equipe")
-            result = cursor.fetchone()
-        return jsonify({"message": "Connexion réussie ! 🚀 ", "result": result}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if connection: 
-            connection.close()
+database_bp = Blueprint('database_controller', __name__)
 
 
-@database_controller.route("/", methods=["GET"])
+@database_bp.route("/tables", methods=["GET"])
 def get_tables():
-    pass
+    try:
+        tables = ServicesDatabase.get_tables()
+
+        return jsonify(tables), 200
+
+    except ConnectionError as e:
+        return jsonify({"Erreur": str(e)}), 500
+
+
+@database_bp.route("/tables/<string:table_name>", methods=["GET"])
+def get_table(table_name):
+    try:
+        table = ServicesDatabase.get_table(table_name)
+        if table is None:
+            return jsonify({"Erreur": f"Table '{table_name}' introuvable."}), 404
+
+        return jsonify(table), 200
+
+    except ConnectionError as e:
+        return jsonify({"Erreur": str(e)}), 500

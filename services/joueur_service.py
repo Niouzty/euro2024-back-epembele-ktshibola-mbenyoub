@@ -1,4 +1,7 @@
-from utils.db_connection import get_db_connection
+from typing import List
+
+from models.joueur_model import Joueur
+from shared.db_connection import get_db_connection
 
 class JoueurService:
 
@@ -28,21 +31,23 @@ class JoueurService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_joueur(id_joueur: int) -> dict | None:
+    def get_joueur(id_joueur: int) -> Joueur:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM joueur WHERE id_joueur = %s"
             cursor.execute(sql, (id_joueur,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return Joueur(**result) if result else None
 
     @staticmethod
-    def get_all_joueurs() -> list[dict]:
+    def get_all_joueurs() -> list[Joueur]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor() as cursor:
             sql = "SELECT * FROM joueur"
             cursor.execute(sql)
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [Joueur(**row) for row in result]
