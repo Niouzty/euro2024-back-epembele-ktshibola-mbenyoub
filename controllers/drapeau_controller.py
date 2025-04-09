@@ -18,7 +18,7 @@ def add_drapeau() -> tuple[Response, int]:
             return jsonify({"error": "Chemin de l'image vide"}), 400
 
         DrapeauService.add_drapeau(id_equipe, chemin_image)
-        return jsonify({"message": "Drapeau ajouté avec succès"}), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -29,7 +29,7 @@ def delete_drapeau(id_drapeau: int) -> tuple[Response, int]:
     try:
         success = DrapeauService.delete_drapeau(id_drapeau)
         if success:
-            return jsonify({"message": "Le drapeau a été supprimé avec succès."}), 200
+            return jsonify({"result": "Le drapeau a été supprimé avec succès."}), 200
         return jsonify({"error": "Aucun drapeau trouvé avec cet ID."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -40,7 +40,7 @@ def get_drapeau(id_drapeau: int) -> tuple[Response, int]:
     try:
         drapeau = DrapeauService.get_drapeau(id_drapeau)
         if drapeau:
-            return jsonify(drapeau), 200
+            return jsonify({"result":drapeau.to_dict()}), 200
         return jsonify({"error": "Drapeau non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -51,7 +51,7 @@ def get_all_drapeaux() -> tuple[Response, int]:
     try:
         drapeaux = DrapeauService.get_all_drapeaux()
         if drapeaux:
-            return jsonify(drapeaux), 200
-        return jsonify({"message": "Aucun drapeau trouvé."}), 404
+            return jsonify({"result":[drapeau.to_dict() for drapeau in drapeaux]}), 200
+        return jsonify({"result": "Aucun drapeau trouvé."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500

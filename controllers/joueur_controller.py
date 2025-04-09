@@ -21,7 +21,7 @@ def add_joueur() -> tuple[Response, int]:
             return jsonify({"error": "Tous les champs sont requis."}), 400
 
         JoueurService.add_joueur(nom, prenom, date_naissance, id_nationalite, id_poste, num_maillot, id_equipe)
-        return jsonify(data), 201
+        return jsonify({"result": data}), 201
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout du joueur. {e}"}), 500
 
@@ -32,7 +32,7 @@ def delete_joueur(id_joueur) -> tuple[Response, int]:
     try:
         success = JoueurService.delete_joueur(id_joueur)
         if success:
-            return jsonify({"message": "Le joueur a été supprimé avec succès."}), 200
+            return jsonify({"result": "Le joueur a été supprimé avec succès."}), 200
         return jsonify({"error": f"La suppression du joueur a échoué. Le joueur n'existe peut-être pas. "}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la suppression du joueur. {e}"}), 500
@@ -44,7 +44,7 @@ def get_joueur(id_joueur: int) -> tuple[Response, int]:
     try:
         joueur = JoueurService.get_joueur(id_joueur)
         if joueur:
-            return jsonify(joueur), 200
+            return jsonify({"result": joueur.to_dict()}), 200
         return jsonify({"error": "Joueur non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": "Erreur interne lors de la récupération du joueur."}), 500
@@ -56,7 +56,7 @@ def get_all_joueurs() -> tuple[Response, int]:
     try:
         joueurs = JoueurService.get_all_joueurs()
         if joueurs:
-            return jsonify(joueurs), 200
+            return jsonify({"result": [joueur.to_dict() for joueur in joueurs]}), 200
         return jsonify({"error": "Aucun joueur trouvé."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des joueurs. {e}"}), 500

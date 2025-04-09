@@ -13,10 +13,10 @@ def add_equipe() -> tuple[Response, int]:
         entraineur = data.get('entraineur')
 
         if not nom or not groupe or not entraineur:
-            return jsonify({"message": "Données manquantes"}), 400
+            return jsonify({"result": "Données manquantes"}), 400
 
         EquipeService.add_equipe(nom, groupe, entraineur)
-        return jsonify(data), 201
+        return jsonify({"result": data}), 201
     except Exception as e:
         return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500
 
@@ -26,8 +26,8 @@ def delete_equipe(id_equipe) -> tuple[Response, int]:
     try:
         success = EquipeService.delete_equipe(id_equipe)
         if success:
-            return jsonify({"message": "L'équipe a été supprimée avec succès."}), 200
-        return jsonify({"message": "La suppression de l'équipe a échoué."}), 400
+            return jsonify({"result": "L'équipe a été supprimée avec succès."}), 200
+        return jsonify({"result": "La suppression de l'équipe a échoué."}), 400
     except Exception as e:
         return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500
 
@@ -37,8 +37,8 @@ def get_equipe(id_equipe: int) -> tuple[Response, int]:
     try:
         equipe = EquipeService.get_equipe(id_equipe)
         if equipe:
-            return jsonify(equipe), 200
-        return jsonify({"message": "Équipe non trouvée."}), 404
+            return jsonify({"result": equipe.to_dict()}), 200
+        return jsonify({"result": "Équipe non trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500
 
@@ -48,7 +48,7 @@ def get_all_equipes_route() -> tuple[Response, int]:
     try:
         equipes = EquipeService.get_all_equipes()
         if equipes:
-            return jsonify(equipes), 200
+            return jsonify({"result": [equipe.to_dict() for equipe in equipes]}), 200
         return jsonify({"message": "Aucune équipe trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500

@@ -28,7 +28,7 @@ class GroupeService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_groupe(id_groupe: int) -> dict | None:
+    def get_groupe(id_groupe: int) -> Groupe | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")

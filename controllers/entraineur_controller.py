@@ -18,7 +18,7 @@ def add_entraineur() -> tuple[Response, int]:
             return jsonify({"error": "Nom ou prénom vide"}), 400
 
         EntraineurService.add_entraineur(nom, prenom, id_nationalite)
-        return jsonify({"message": "Entraîneur ajouté avec succès."}), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -29,7 +29,7 @@ def delete_entraineur(id_entraineur) -> tuple[Response, int]:
     try:
         success = EntraineurService.delete_entraineur(id_entraineur)
         if success:
-            return jsonify({"message": "L'entraîneur a été supprimé avec succès."}), 200
+            return jsonify({"result": "L'entraîneur a été supprimé avec succès."}), 200
         return jsonify({"error": "Aucun entraîneur trouvé avec cet ID."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -40,7 +40,7 @@ def get_entraineur(id_entraineur: int) -> tuple[Response, int]:
     try:
         entraineur = EntraineurService.get_entraineur(id_entraineur)
         if entraineur:
-            return jsonify(entraineur), 200
+            return jsonify({"result": entraineur.to_dict()}), 200
         return jsonify({"error": "Entraîneur non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -51,7 +51,7 @@ def get_all_entraineurs() -> tuple[Response, int]:
     try:
         entraineurs = EntraineurService.get_all_entraineurs()
         if entraineurs:
-            return jsonify(entraineurs), 200
-        return jsonify({"message": "Aucun entraîneur trouvé."}), 404
+            return jsonify({"result": entraineur.to_dict() for entraineur in entraineurs}), 200
+        return jsonify({"result": "Aucun entraîneur trouvé."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -15,7 +15,7 @@ def add_arbitre():
 
     try:
         ArbitreService.add_arbitre(nom, prenom, id_nationalite)
-        return jsonify({"message": "Arbitre ajouté avec succès."}), 201
+        return jsonify({"result": data}), 201
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
 
@@ -25,7 +25,7 @@ def delete_arbitre(id_arbitre):
     try:
         deleted = ArbitreService.delete_arbitre(id_arbitre)
         if deleted:
-            return jsonify({"message": "Arbitre supprimé avec succès."})
+            return jsonify({"result": "Arbitre supprimé avec succès."})
         else:
             return jsonify({"erreur": "Arbitre non trouvé."}), 404
     except Exception as e:
@@ -37,7 +37,7 @@ def get_arbitre(id_arbitre):
     try:
         arbitre = ArbitreService.get_arbitre(id_arbitre)
         if arbitre:
-            return jsonify(arbitre)
+            return jsonify({"result" : arbitre.to_dict()})
         else:
             return jsonify({"erreur": "Arbitre non trouvé."}), 404
     except Exception as e:
@@ -48,7 +48,7 @@ def get_arbitre(id_arbitre):
 def get_arbitres():
     try:
         arbitres = ArbitreService.get_all_arbitres()
-        return jsonify(arbitres)
+        return jsonify({"result" : [arbitre.to_dict() for arbitre in arbitres]})
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
 

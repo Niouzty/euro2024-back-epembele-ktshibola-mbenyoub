@@ -14,7 +14,7 @@ def add_phase_tournoi() -> tuple[Response, int]:
             return jsonify({"error": "Le nom de la phase du tournoi est requis."}), 400
 
         PhaseTournoiService.add_phase_tournoi(nom)
-        return jsonify(data), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout de la phase du tournoi. {e}"}), 500
@@ -37,7 +37,7 @@ def get_phase_tournoi(id_phase: int) -> tuple[Response, int]:
     try:
         phase_tournoi = PhaseTournoiService.get_phase_tournoi(id_phase)
         if phase_tournoi:
-            return jsonify(phase_tournoi), 200
+            return jsonify({"result": phase_tournoi.to_dict()}), 200
         return jsonify({"error": "Phase du tournoi non trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération de la phase du tournoi. {e}"}), 500

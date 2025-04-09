@@ -13,7 +13,7 @@ def get_stades():
         offset = (page - 1) * taille_page
 
         stades = StadeService.get_stades(offset, taille_page)
-        return jsonify(stades), 200
+        return jsonify({"result" : [stade.to_dict() for stade in stades]}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -23,7 +23,7 @@ def get_stade(stade_id):
     try:
         stade = StadeService.get_stade(stade_id)
         if stade:
-            return jsonify(stade), 200
+            return jsonify({"result" : stade.to_dict()}), 200
         return jsonify({"error": "Stade non trouvé"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -39,7 +39,7 @@ def supprimer_stade(stade_id):
             return jsonify({"error": "Stade non trouvé"}), 404
 
         StadeService.delete_stade(stade_id)
-        return jsonify({"message": "Stade supprimé avec succès"}), 200
+        return jsonify({"result": "Stade supprimé avec succès"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -79,7 +79,7 @@ def update_stade(stade_id):
         if not success:
             return jsonify({"error": "Erreur lors de la mise à jour du stade"}), 500
 
-        return jsonify({"message": "Stade mis à jour avec succès"}), 200
+        return jsonify({"result": "Stade mis à jour avec succès"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -110,6 +110,7 @@ def insert():
                     StadeService.add_stade(row['nom'], row['id_ville'], row['capacite'], row['id_stade'])
                 else:
                     StadeService.add_stade(row['nom'], row['id_ville'], row['capacite'])
+                return jsonify({"result": data}), 201
 
             except Exception as e:
                 row["error"] = str(e)

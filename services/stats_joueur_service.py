@@ -1,3 +1,4 @@
+from models.stats_joueur_model import StatsJoueur
 from shared.db_connection import get_db_connection
 
 class StatsJoueurService:
@@ -28,24 +29,25 @@ class StatsJoueurService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_stats_joueur(id_stats_joueur: int) -> dict | None:
+    def get_stats_joueur(id_stats_joueur: int) -> StatsJoueur | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM stats_joueur WHERE id_stats_joueur = %s"
             cursor.execute(sql, (id_stats_joueur,))
-            return cursor.fetchone()
-
+            res = cursor.fetchone()
+            return StatsJoueur(**res) if res else None
     @staticmethod
-    def get_all_stats_joueurs() -> list[dict]:
+    def get_all_stats_joueurs() -> list[StatsJoueur]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
             sql = "SELECT * FROM stats_joueur"
             cursor.execute(sql)
-            return cursor.fetchall()
+            res = cursor.fetchall()
+            return  [StatsJoueur(**row) for row in res]
 
     @staticmethod
     def get_top_butteurs() -> list[dict]:

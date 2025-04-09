@@ -16,7 +16,7 @@ def add_nationalite() -> tuple[Response, int]:
 
         # Ajouter la nationalité en utilisant le service
         NationaliteService.add_nationalite(nom)
-        return jsonify(data), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout de la nationalité. {e}"}), 500
@@ -41,7 +41,7 @@ def get_nationalite(id_nationalite: int) -> tuple[Response, int]:
     try:
         nationalite = NationaliteService.get_nationalite(id_nationalite)
         if nationalite:
-            return jsonify(nationalite), 200
+            return jsonify({"result": nationalite.to_dict()}), 200
         return jsonify({"error": "Nationalité non trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération de la nationalité.{e}"}), 500
@@ -53,7 +53,7 @@ def get_all_nationalites() -> tuple[Response, int]:
     try:
         nationalites = NationaliteService.get_all_nationalites()
         if nationalites:
-            return jsonify(nationalites), 200
+            return jsonify({"result": [nationalite.to_dict() for nationalite in nationalites]}), 200
         return jsonify({"error": "Aucune nationalité trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des nationalités. {e}"}), 500

@@ -34,7 +34,7 @@ def add_rencontre() -> tuple[Response, int]:
             score_final, phase_tournoi, date, id_stade, id_equipe, id_equipe_equipeb
         )
         if success:
-            return jsonify({"message": "Rencontre ajoutée avec succès."}), 201
+            return jsonify({"result": data}), 201
 
         return jsonify({"error": "Erreur lors de l'ajout de la rencontre."}), 500
 
@@ -48,7 +48,7 @@ def delete_rencontre(id_match: int) -> tuple[Response, int]:
     try:
         success = RencontreService.delete_rencontre(id_match)
         if success:
-            return jsonify({"message": "Rencontre supprimée avec succès."}), 200
+            return jsonify({"result": "Rencontre supprimée avec succès."}), 200
         return jsonify({"error": "Suppression échouée. La rencontre n'existe peut-être pas."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la suppression de la rencontre. {e}"}), 500
@@ -60,7 +60,7 @@ def get_rencontre(id_match: int) -> tuple[Response, int]:
     try:
         rencontre = RencontreService.get_rencontre(id_match)
         if rencontre:
-            return jsonify(rencontre), 200
+            return jsonify({"result": rencontre.to_dict()}), 200
         return jsonify({"error": "Rencontre non trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération de la rencontre. {e}"}), 500
@@ -72,7 +72,7 @@ def get_all_rencontres() -> tuple[Response, int]:
     try:
         rencontres = RencontreService.get_all_rencontres()
         if rencontres:
-            return jsonify(rencontres), 200
+            return jsonify({"result": [rencontre.to_dict() for rencontre in rencontres]}), 200
         return jsonify({"error": "Aucune rencontre trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des rencontres. {e}"}), 500

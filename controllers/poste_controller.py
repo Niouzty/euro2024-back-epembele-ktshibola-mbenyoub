@@ -15,7 +15,7 @@ def add_poste() -> tuple[Response, int]:
             return jsonify({"error": "Le nom du poste est requis."}), 400
 
         PosteService.add_poste(nom_poste)
-        return jsonify(data), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout du poste. {e}"}), 500
@@ -39,7 +39,7 @@ def get_poste(id_poste: int) -> tuple[Response, int]:
     try:
         poste = PosteService.get_poste(id_poste)
         if poste:
-            return jsonify(poste), 200
+            return jsonify({"result": poste.to_dict()}), 200
         return jsonify({"error": "Poste non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération du poste. {e}"}), 500
@@ -51,7 +51,7 @@ def get_all_postes() -> tuple[Response, int]:
     try:
         postes = PosteService.get_all_postes()
         if postes:
-            return jsonify(postes), 200
+            return jsonify({"result": [poste.to_dict() for poste in postes]}), 200
         return jsonify({"error": "Aucun poste trouvé."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des postes. {e}"}), 500

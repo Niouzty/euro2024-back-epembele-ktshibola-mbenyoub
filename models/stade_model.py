@@ -1,10 +1,10 @@
 class Stade:
 
-    def __init__(self, id_stade: int, nom: str, ville: str, capicite: int):
+    def __init__(self, id_stade: int, nom: str, id_ville: str, capacite: int):
         self.id_stade = id_stade
         self.nom = nom
-        self.ville = ville
-        self.capicite = capicite
+        self.id_ville = id_ville
+        self.capacite = capacite
 
 
 
@@ -12,8 +12,8 @@ class Stade:
         return {
             "id_stade": self.id_stade,
             "nom": self.nom,
-            "ville": self.ville,
-            "capacite": self.capicite
+            "id_ville": self.id_ville,
+            "capacite": self.capacite
         }
 
 

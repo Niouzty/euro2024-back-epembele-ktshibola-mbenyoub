@@ -14,7 +14,7 @@ def add_groupe() -> tuple[Response, int]:
             return jsonify({"error": "Le nom du groupe est requis."}), 400
 
         GroupeService.add_groupe(nom)
-        return jsonify(data), 201
+        return jsonify({"result": data}), 201
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout du groupe. {e}"}), 500
 
@@ -25,7 +25,7 @@ def delete_groupe(id_groupe) -> tuple[Response, int]:
     try:
         success = GroupeService.delete_groupe(id_groupe)
         if success:
-            return jsonify({"message": "Le groupe a été supprimé avec succès."}), 200
+            return jsonify({"result": "Le groupe a été supprimé avec succès."}), 200
         return jsonify({"error": f"La suppression du groupe a échoué. Le groupe n'existe peut-être pas."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la suppression du groupe. {e}"}), 500
@@ -37,7 +37,7 @@ def get_groupe(id_groupe: int) -> tuple[Response, int]:
     try:
         groupe = GroupeService.get_groupe(id_groupe)
         if groupe:
-            return jsonify(groupe), 200
+            return jsonify({"result": groupe.to_dict()}), 200
         return jsonify({"error": "Groupe non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne:{e}"}), 500
@@ -49,7 +49,7 @@ def get_all_groupes() -> tuple[Response, int]:
     try:
         groupes = GroupeService.get_all_groupes()
         if groupes:
-            return jsonify(groupes), 200
+            return jsonify({"result": [groupe.to_dict() for groupe in groupes]}), 200
         return jsonify({"message": "Aucun groupe trouvé."}), 404
     except Exception as e:
         return jsonify({"message": f"Erreur interne lors de la récupération des groupes {e}."}), 500

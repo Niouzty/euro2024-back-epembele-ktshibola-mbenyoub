@@ -35,7 +35,7 @@ def add_stats_joueur() -> tuple[Response, int]:
             data['cartons_rouges'],
             data['minutes_jouees']
         )
-        return jsonify({"message": "Statistiques du joueur ajoutées avec succès."}), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout des statistiques. {e}"}), 500
@@ -47,7 +47,7 @@ def delete_stats_joueur(id_stats_joueur: int) -> tuple[Response, int]:
     try:
         success = StatsJoueurService.delete_stats_joueur(id_stats_joueur)
         if success:
-            return jsonify({"message": "Les statistiques du joueur ont été supprimées avec succès."}), 200
+            return jsonify({"result": "Les statistiques du joueur ont été supprimées avec succès."}), 200
         return jsonify({"error": "Suppression échouée. Les statistiques n'existent peut-être pas."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la suppression des statistiques. {e}"}), 500
@@ -59,7 +59,7 @@ def get_stats_joueur(id_stats_joueur: int) -> tuple[Response, int]:
     try:
         stats_joueur = StatsJoueurService.get_stats_joueur(id_stats_joueur)
         if stats_joueur:
-            return jsonify(stats_joueur), 200
+            return jsonify({"result": stats_joueur.to_dict()}), 200
         return jsonify({"error": "Statistiques du joueur non trouvées."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des statistiques. {e}"}), 500
@@ -71,7 +71,7 @@ def get_all_stats_joueurs() -> tuple[Response, int]:
     try:
         stats_joueurs = StatsJoueurService.get_all_stats_joueurs()
         if stats_joueurs:
-            return jsonify(stats_joueurs), 200
+            return jsonify({"result": [stats_joueur.to_dict() for  stats_joueur in stats_joueurs]}), 200
         return jsonify({"error": "Aucune statistique de joueur trouvée."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des statistiques. {e}"}), 500

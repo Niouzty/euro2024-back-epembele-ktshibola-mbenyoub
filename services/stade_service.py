@@ -50,11 +50,16 @@ class StadeService:
     @staticmethod
     def get_stades(offset: int, limit: int):
         conn = StadeService.get_connexion()
+
+        if not conn:
+            raise ConnectionError("Connexion à la base de données échouée.")
+
         with conn.cursor() as cursor:
-            query = "SELECT * FROM stade LIMIT %s OFFSET %s"
+            query = "SELECT * FROM stade LIMIT %s OFFSET %s;"
             cursor.execute(query, (limit, offset))
             results = cursor.fetchall()
             return [Stade(**row) for row in results]
+
 
     @staticmethod
     def sort_by_capacity():

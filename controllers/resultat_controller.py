@@ -42,7 +42,7 @@ def add_resultat() -> tuple[Response, int]:
             data['score_tirs_au_but_equipe1'],
             data['score_tirs_au_but_equipe2']
         )
-        return jsonify({"message": "Résultat ajouté avec succès."}), 201
+        return jsonify({"result": data}), 201
 
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de l'ajout du résultat. {e}"}), 500
@@ -54,7 +54,7 @@ def delete_resultat(id_resultat: int) -> tuple[Response, int]:
     try:
         success = ResultatService.delete_resultat(id_resultat)
         if success:
-            return jsonify({"message": "Le résultat a été supprimé avec succès."}), 200
+            return jsonify({"result": "Le résultat a été supprimé avec succès."}), 200
         return jsonify({"error": "Suppression échouée. Le résultat n'existe peut-être pas."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la suppression du résultat. {e}"}), 500
@@ -66,7 +66,7 @@ def get_resultat(id_resultat: int) -> tuple[Response, int]:
     try:
         resultat = ResultatService.get_resultat(id_resultat)
         if resultat:
-            return jsonify(resultat), 200
+            return jsonify({"result": resultat.to_dict()}), 200
         return jsonify({"error": "Résultat non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération du résultat. {e}"}), 500
@@ -78,7 +78,7 @@ def get_all_resultats() -> tuple[Response, int]:
     try:
         resultats = ResultatService.get_all_resultats()
         if resultats:
-            return jsonify(resultats), 200
+            return jsonify({"result": [resultat.to_dict() for resultat in resultats]}), 200
         return jsonify({"error": "Aucun résultat trouvé."}), 404
     except Exception as e:
         return jsonify({"error": f"Erreur interne lors de la récupération des résultats. {e}"}), 500

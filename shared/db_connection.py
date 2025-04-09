@@ -33,7 +33,11 @@ DB_CONFIG = {
 def get_db_connection():
     """Établit et retourne une connexion à la base de données."""
     try:
+        print("co")
+
         connection = pymysql.connect(**DB_CONFIG)
+        print("co21")
+
         logging.info("Connexion à la base de données réussie.")
         return connection
     except pymysql.MySQLError as e:
