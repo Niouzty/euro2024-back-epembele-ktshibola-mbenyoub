@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
 from services.arbitre_service import ArbitreService
 
-arbitre_bp = Blueprint('arbitre', __name__)
+arbitre_bp = Blueprint('arbitre', __name__,'arbitres')
 
-@arbitre_bp.route('/arbitres', methods=['POST'])
+@arbitre_bp.route('/', methods=['POST'])
 def add_arbitre():
     data = request.get_json()
     nom = data.get('nom')
@@ -20,7 +20,7 @@ def add_arbitre():
         return jsonify({"erreur": str(e)}), 500
 
 
-@arbitre_bp.route('/arbitres/<int:id_arbitre>', methods=['DELETE'])
+@arbitre_bp.route('/<int:id_arbitre>', methods=['DELETE'])
 def delete_arbitre(id_arbitre):
     try:
         deleted = ArbitreService.delete_arbitre(id_arbitre)
@@ -32,7 +32,7 @@ def delete_arbitre(id_arbitre):
         return jsonify({"erreur": str(e)}), 500
 
 
-@arbitre_bp.route('/arbitres/<int:id_arbitre>', methods=['GET'])
+@arbitre_bp.route('/<int:id_arbitre>', methods=['GET'])
 def get_arbitre(id_arbitre):
     try:
         arbitre = ArbitreService.get_arbitre(id_arbitre)
@@ -44,7 +44,7 @@ def get_arbitre(id_arbitre):
         return jsonify({"erreur": str(e)}), 500
 
 
-@arbitre_bp.route('/arbitres', methods=['GET'])
+@arbitre_bp.route('/', methods=['GET'])
 def get_arbitres():
     try:
         arbitres = ArbitreService.get_all_arbitres()
@@ -53,7 +53,7 @@ def get_arbitres():
         return jsonify({"erreur": str(e)}), 500
 
 
-@arbitre_bp.route('/arbitres/resultats', methods=['GET'])
+@arbitre_bp.route('/resultats', methods=['GET'])
 def get_statistiques_arbitres():
     try:
         resultats = ArbitreService.get_all_result()
