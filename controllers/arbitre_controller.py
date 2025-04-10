@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.arbitre_service import ArbitreService
 
-arbitre_bp = Blueprint('arbitre', __name__,'arbitres')
-
+arbitre_bp = Blueprint('arbitres', __name__, url_prefix='/arbitres')
 @arbitre_bp.route('/', methods=['POST'])
 def add_arbitre():
     data = request.get_json()
@@ -53,10 +52,11 @@ def get_arbitres():
         return jsonify({"erreur": str(e)}), 500
 
 
-@arbitre_bp.route('/resultats', methods=['GET'])
+@arbitre_bp.route('/arbitres-result', methods=['GET'])
 def get_statistiques_arbitres():
     try:
         resultats = ArbitreService.get_all_result()
-        return jsonify(resultats)
+        print(resultats)
+        return jsonify(resultats), 200
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500

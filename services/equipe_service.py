@@ -54,6 +54,17 @@ class EquipeService:
             return [Equipe(**row) for row in result]
 
     @staticmethod
+    def get_all_equipes_compare() -> list[dict]:
+        connection = get_db_connection()
+
+        if not connection:
+            raise ConnectionError("Connexion à la base de données échouée.")
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM equipe"
+            cursor.execute(sql)
+            return cursor.fetchall()
+        
+    @staticmethod
     def get_equipes_by_groupe(id_groupe: str) -> list[Equipe]:
         connection = get_db_connection()
 

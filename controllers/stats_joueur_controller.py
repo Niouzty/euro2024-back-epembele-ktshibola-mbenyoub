@@ -82,6 +82,7 @@ def get_all_stats_joueurs() -> tuple[Response, int]:
 def get_top_joueur() -> tuple[Response, int]:
     try:
         stats_joueurs = StatsJoueurService.get_top_butteurs()
+        print(stats_joueurs)
         if stats_joueurs:
             return jsonify(stats_joueurs), 200
         return jsonify({"error": "Aucun joueur trouvé."}), 404

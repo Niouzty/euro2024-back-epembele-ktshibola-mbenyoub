@@ -56,21 +56,20 @@ class ArbitreService:
 
         if not connection:
             raise ConnectionError("Échec de la connexion à la base de données.")
-
         with connection.cursor() as cursor:
             sql = """
                 SELECT
                     a.id_arbitre,
                     a.nom, 
                     a.prenom, 
-                    COUNT(DISTINCT r.id_match) AS nombre_de_matchs,
-                    COUNT(c.id_carton) AS nombre_de_cartons,
-                    COALESCE(SUM(CASE WHEN c.type_carton = 'jaune' THEN 1 ELSE 0 END), 0) AS cartons_jaunes,
-                    COALESCE(SUM(CASE WHEN c.type_carton = 'rouge' THEN 1 ELSE 0 END), 0) AS cartons_rouges
+                    COUNT(r.id_match) AS nombre_matchs,
+                    COALESCE(SUM(r.nb_cartons_jaunes), 0) AS carton_jaunes,  # Changé de cartons_jaunes
+                    COALESCE(SUM(r.nb_cartons_rouges), 0) AS carton_rouges,  # Changé de cartons_rouges
+                    (COALESCE(SUM(r.nb_cartons_jaunes), 0) + COALESCE(SUM(r.nb_cartons_rouges), 0)) AS nombre_cartons 
                 FROM arbitre a
                 LEFT JOIN rencontre r ON a.id_arbitre = r.id_arbitre
-                LEFT JOIN carton c ON r.id_match = c.id_match AND a.id_arbitre = c.id_arbitre
-                GROUP BY a.id_arbitre, a.nom, a.prenom;
+                GROUP BY a.id_arbitre, a.nom, a.prenom
+                ORDER BY a.nom, a.prenom
             """
             cursor.execute(sql)
             return cursor.fetchall()
