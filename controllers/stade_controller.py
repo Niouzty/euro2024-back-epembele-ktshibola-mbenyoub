@@ -41,7 +41,7 @@ def supprimer_stade(stade_id):
         StadeService.delete_stade(stade_id)
         return jsonify({"result": "Stade supprimé avec succès"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e) + " hjhh"}), 500
 
 
 @stade_controllers.route('/nombres', methods=['GET'])
@@ -91,36 +91,44 @@ def update_stade(stade_id):
 def insert():
     try:
         data = request.get_json() or {}
-        stades = data.get("stades")
 
-        if not isinstance(stades, list) or not stades:
+
+        if not isinstance(data, list) or not data:
             return jsonify({"error": "Le champ 'stades' doit être une liste non vide"}), 400
 
         non_inserees = []
+        success_count = 0
 
-        for row in stades:
-            # Vérification des attributs obligatoires
+        for row in data:
+            print(row)
+            print(row.get("nom"))
+            # On vérifie que chaque élément est bien un dictionnaire
+            if not isinstance(row, dict):
+                non_inserees.append({"error": "Chaque élément doit être un objet (dictionnaire)", "row": row})
+                continue
+
+            # Vérification des champs obligatoires
             if not all(key in row and row[key] is not None for key in ("nom", "id_ville", "capacite")):
-                row["error"] = "Attribut(s) obligatoire(s) manquant(s) (nom, id_ville, capacite)"
+                row["error"] = "Champs obligatoires manquants : nom, id_ville, capacite"
                 non_inserees.append(row)
                 continue
 
             try:
                 if row.get('id_stade') is not None:
-                    StadeService.add_stade(row['nom'], row['id_ville'], row['capacite'], row['id_stade'])
+                    StadeService.add_stade(row['nom'], int(row['id_ville']), int(row['capacite']), int(row['id_stade']))
                 else:
-                    StadeService.add_stade(row['nom'], row['id_ville'], row['capacite'])
-                return jsonify({"result": data}), 201
+                    StadeService.add_stade(row['nom'], int(row['id_ville']), int(row['capacite']))
+
+                success_count += 1
 
             except Exception as e:
                 row["error"] = str(e)
                 non_inserees.append(row)
 
-        total = len(stades)
-        success_count = total - len(non_inserees)
+        total = len(data)
 
         if success_count == total:
-            return jsonify({"result": f"{success_count} stades insérés"}), 200
+            return jsonify({"result": f"{success_count} stades insérés"}), 201
         elif success_count > 0:
             return jsonify({
                 "result": f"{success_count} stades insérés, {len(non_inserees)} échecs",
@@ -133,5 +141,5 @@ def insert():
             }), 400
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Erreur serveur : {str(e)}"}), 500
 

@@ -30,6 +30,9 @@ class StadeService:
     @staticmethod
     def delete_stade(id_stade: int):
         conn = StadeService.get_connexion()
+        if not conn:
+            raise ConnectionError("erreur co bd")
+
         with conn.cursor() as cursor:
             query = "DELETE FROM stade WHERE id_stade = %s"
             cursor.execute(query, (id_stade,))
