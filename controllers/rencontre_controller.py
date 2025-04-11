@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, Response
 from services.rencontre_service import RencontreService
 
-rencontre_controller = Blueprint('matchs', __name__, url_prefix='/matchs')
+rencontre_controller = Blueprint('matchs', __name__, url_prefix='/rencontres')
 
 
 # Route pour ajouter une rencontre
@@ -70,9 +70,19 @@ def get_rencontre(id_match: int) -> tuple[Response, int]:
 @rencontre_controller.route('/', methods=['GET'])
 def get_all_rencontres() -> tuple[Response, int]:
     try:
-        rencontres = RencontreService.get_all_rencontres()
-        if rencontres:
-            return jsonify({"result": [rencontre.to_dict() for rencontre in rencontres]}), 200
-        return jsonify({"error": "Aucune rencontre trouvée."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = RencontreService.get_rencontres(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des rencontres. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@rencontre_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = RencontreService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

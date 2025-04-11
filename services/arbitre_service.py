@@ -1,5 +1,4 @@
 from typing import List
-
 from models.arbitre_model import Arbitre
 from shared.db_connection import get_db_connection
 
@@ -40,23 +39,32 @@ class ArbitreService:
             return Arbitre(**row) if row else None
 
     @staticmethod
-    def get_all_arbitres() -> list[Arbitre]:
+    def get_arbitres(offset: int, limit: int) -> List[Arbitre]:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM arbitre"
-            cursor.execute(sql)
+            sql = "SELECT * FROM arbitre LIMIT %s OFFSET %s"
+            cursor.execute(sql, (limit, offset))
             rows = cursor.fetchall()
             return [Arbitre(**row) for row in rows]
 
     @staticmethod
-    def get_all_result() -> list[dict]:
+    def get_number_row() -> int:
         connection = get_db_connection()
-
         if not connection:
             raise ConnectionError("Échec de la connexion à la base de données.")
+        with connection.cursor() as cursor:
+            sql = "SELECT COUNT(*) FROM arbitre"
+            cursor.execute(sql)
+            row = cursor.fetchone()
+            return row['COUNT(*)'] if row else 0
 
+    @staticmethod
+    def get_all_result() -> list[dict]:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
             sql = """
                 SELECT

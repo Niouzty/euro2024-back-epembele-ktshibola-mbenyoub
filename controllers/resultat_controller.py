@@ -76,9 +76,19 @@ def get_resultat(id_resultat: int) -> tuple[Response, int]:
 @resultat_controller.route('/', methods=['GET'])
 def get_all_resultats() -> tuple[Response, int]:
     try:
-        resultats = ResultatService.get_all_resultats()
-        if resultats:
-            return jsonify({"result": [resultat.to_dict() for resultat in resultats]}), 200
-        return jsonify({"error": "Aucun résultat trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = ResultatService.get_resultats(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des résultats. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@resultat_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = ResultatService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

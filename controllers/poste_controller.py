@@ -49,9 +49,20 @@ def get_poste(id_poste: int) -> tuple[Response, int]:
 @poste_controller.route('/', methods=['GET'])
 def get_all_postes() -> tuple[Response, int]:
     try:
-        postes = PosteService.get_all_postes()
-        if postes:
-            return jsonify({"result": [poste.to_dict() for poste in postes]}), 200
-        return jsonify({"error": "Aucun poste trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = PosteService.get_postes(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des postes. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@poste_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = PosteService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+

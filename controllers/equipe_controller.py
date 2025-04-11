@@ -46,12 +46,26 @@ def get_equipe(id_equipe: int) -> tuple[Response, int]:
 @equipe_controller.route('/', methods=['GET'])
 def get_all_equipes_route() -> tuple[Response, int]:
     try:
-        equipes = EquipeService.get_all_equipes()
-        if equipes:
-            return jsonify({"result": [equipe.to_dict() for equipe in equipes]}), 200
-        return jsonify({"message": "Aucune équipe trouvée."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        equipes = EquipeService.get_equipes(offset=offset, limit=limit)
+        return jsonify({"result": [e.to_dict() for e in equipes]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+@equipe_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = EquipeService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
+
 
 
 @equipe_controller.route('/compare', methods=['POST'])

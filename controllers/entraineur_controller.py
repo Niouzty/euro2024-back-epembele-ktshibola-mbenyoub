@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from flask import Blueprint, jsonify, request, Response
 from services.entraineur_service import EntraineurService
 
@@ -49,9 +51,30 @@ def get_entraineur(id_entraineur: int) -> tuple[Response, int]:
 @entraineur_controller.route('/', methods=['GET'])
 def get_all_entraineurs() -> tuple[Response, int]:
     try:
-        entraineurs = EntraineurService.get_all_entraineurs()
-        if entraineurs:
-            return jsonify({"result": entraineur.to_dict() for entraineur in entraineurs}), 200
-        return jsonify({"result": "Aucun entraîneur trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        es = EntraineurService.get_all_entraineurs(offset, limit)
+        return jsonify({"result": [e.to_dict() for e in es]}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@entraineur_controller.route('/nombres', methods=['GET'])
+def get_nombre_arbitres():
+    try:
+        total = EntraineurService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
+
+
+
+@entraineur_controller.route('/nombres', methods=['GET'])
+def get_nombre_entraineurs() -> tuple[Response, int]:
+    try:
+        total = EntraineurService.get_number_row()
+        return jsonify({"result": total}),200
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

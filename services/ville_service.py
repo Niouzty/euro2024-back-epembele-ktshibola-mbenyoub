@@ -39,15 +39,17 @@ class VilleService:
             return Ville(**result) if result else None
 
     @staticmethod
-    def get_all_villes() -> list[Ville]:
+    def get_villes(offset: int, limit: int) -> list[Ville]:
         connection = get_db_connection()
         if not connection:
-            raise ConnectionError("Connexion à la base de données échouée.")
-        with connection.cursor(dictionary=True) as cursor:
-            sql = "SELECT * FROM ville"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return [Ville(**row) for row in result]
+            raise ConnectionError("Échec de la connexion à la base de données.")
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM ville LIMIT %s OFFSET %s"
+            cursor.execute(sql, (limit, offset))
+            rows = cursor.fetchall()
+            print(rows)
+            return [Ville(**row) for row in rows]
+
     @staticmethod
     def update_ville(id_ville: int, new_nom: str) -> bool:
         connection = get_db_connection()
@@ -58,3 +60,15 @@ class VilleService:
             cursor.execute(sql, (new_nom, id_ville))
             connection.commit()
             return cursor.rowcount > 0
+
+    @staticmethod
+    def get_number_row() -> int:
+        conn = get_db_connection()
+        if not conn:
+            raise ConnectionError("Connexion à la base de données échouée.")
+
+        with conn.cursor() as cursor:
+            query = "SELECT COUNT(*) FROM ville"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result['COUNT(*)'] if result else 0

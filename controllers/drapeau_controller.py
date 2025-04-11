@@ -40,7 +40,7 @@ def get_drapeau(id_drapeau: int) -> tuple[Response, int]:
     try:
         drapeau = DrapeauService.get_drapeau(id_drapeau)
         if drapeau:
-            return jsonify({"result":drapeau.to_dict()}), 200
+            return jsonify({"result": drapeau.to_dict()}), 200
         return jsonify({"error": "Drapeau non trouvé."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -49,9 +49,26 @@ def get_drapeau(id_drapeau: int) -> tuple[Response, int]:
 @drapeau_controller.route('/', methods=['GET'])
 def get_all_drapeaux() -> tuple[Response, int]:
     try:
-        drapeaux = DrapeauService.get_all_drapeaux()
-        if drapeaux:
-            return jsonify({"result":[drapeau.to_dict() for drapeau in drapeaux]}), 200
-        return jsonify({"result": "Aucun drapeau trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        drapeaux = DrapeauService.get_all_drapeaux(offset=offset, limit=limit)
+        return jsonify({"result": [drapeau.to_dict() for drapeau in drapeaux]}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@drapeau_controller.route('/nombres', methods=['GET'])
+def get_nombre_arbitres():
+    try:
+        total = DrapeauService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
+@drapeau_controller.route('/nombres', methods=['GET'])
+def get_nombre_drapeaux() -> tuple[Response, int]:
+    try:
+        total = DrapeauService.get_number_row()
+        return jsonify({"result": total}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

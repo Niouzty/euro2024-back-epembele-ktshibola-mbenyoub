@@ -37,12 +37,24 @@ class PosteService:
             return Poste(**result) if result else None
 
     @staticmethod
-    def get_all_postes() -> list[Poste]:
+    def get_postes(offset: int, limit: int) -> list[Poste]:
         connection = get_db_connection()
         if not connection:
-            raise ConnectionError("Connexion à la base de données échouée.")
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM poste"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return [Poste(**row) for row in result]
+            sql = "SELECT * FROM poste LIMIT %s OFFSET %s"
+            cursor.execute(sql, (limit, offset))
+            rows = cursor.fetchall()
+            return [Poste(**row) for row in rows]
+
+    @staticmethod
+    def get_number_row() -> int:
+        conn = get_db_connection()
+        if not conn:
+            raise ConnectionError("Connexion à la base de données échouée.")
+
+        with conn.cursor() as cursor:
+            query = "SELECT COUNT(*) FROM poste"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result['COUNT(*)'] if result else 0

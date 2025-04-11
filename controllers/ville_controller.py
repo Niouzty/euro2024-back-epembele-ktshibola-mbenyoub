@@ -51,9 +51,19 @@ def get_ville(id_ville: int) -> tuple[Response, int]:
 @ville_controller.route('/', methods=['GET'])
 def get_all_villes() -> tuple[Response, int]:
     try:
-        villes = VilleService.get_all_villes()
-        if villes:
-            return jsonify({"result": [ville.to_dict() for ville in villes]}), 200
-        return jsonify({"error": "Aucune ville trouvée."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = VilleService.get_villes(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des villes. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@ville_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = VilleService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

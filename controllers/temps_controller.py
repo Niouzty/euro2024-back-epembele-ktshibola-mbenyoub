@@ -51,9 +51,19 @@ def get_temps(id_temps: int) -> tuple[Response, int]:
 @temps_controller.route('/', methods=['GET'])
 def get_all_temps() -> tuple[Response, int]:
     try:
-        temps = TempsService.get_all_temps()
-        if temps:
-            return jsonify({"result":[ tempsR.to_dict() for tempsR in temps]}), 200
-        return jsonify({"error": "Aucun temps trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = TempsService.get_tempss(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des temps. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@temps_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = TempsService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

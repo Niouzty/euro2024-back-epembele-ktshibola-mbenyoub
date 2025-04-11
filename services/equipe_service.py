@@ -42,16 +42,15 @@ class EquipeService:
             return Equipe(**result) if result else None
 
     @staticmethod
-    def get_all_equipes() -> list[Equipe]:
+    def get_equipes(offset: int, limit: int) -> list[Equipe]:
         connection = get_db_connection()
-
         if not connection:
-            raise ConnectionError("Connexion à la base de données échouée.")
+            raise ConnectionError("Échec de la connexion à la base de données.")
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM equipe"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return [Equipe(**row) for row in result]
+            sql = "SELECT * FROM equipe LIMIT %s OFFSET %s"
+            cursor.execute(sql, (limit, offset))
+            rows = cursor.fetchall()
+            return [Equipe(**row) for row in rows]
 
     @staticmethod
     def get_equipes_by_groupe(id_groupe: str) -> list[Equipe]:
@@ -102,3 +101,15 @@ class EquipeService:
             """
             cursor.execute(sql, (id_equipe,))
             return cursor.fetchall()
+
+    @staticmethod
+    def get_number_row() -> int:
+        conn = get_db_connection()
+        if not conn:
+            raise ConnectionError("Connexion à la base de données échouée.")
+
+        with conn.cursor() as cursor:
+            query = "SELECT COUNT(*) FROM equipe"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result['COUNT(*)'] if result else 0

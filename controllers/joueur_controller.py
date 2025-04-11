@@ -54,9 +54,20 @@ def get_joueur(id_joueur: int) -> tuple[Response, int]:
 @joueur_controller.route('/', methods=['GET'])
 def get_all_joueurs() -> tuple[Response, int]:
     try:
-        joueurs = JoueurService.get_all_joueurs()
-        if joueurs:
-            return jsonify({"result": [joueur.to_dict() for joueur in joueurs]}), 200
-        return jsonify({"error": "Aucun joueur trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        gs = JoueurService.get_joueurs(offset=offset, limit=limit)
+        return jsonify({"result": [g.to_dict() for g in gs]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des joueurs. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@joueur_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = JoueurService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+

@@ -42,12 +42,24 @@ class ResultatService:
             return Resultat(**result) if result else None
 
     @staticmethod
-    def get_all_resultats() -> list[Resultat]:
+    def get_resultats(offset: int, limit: int) -> list[Resultat]:
         connection = get_db_connection()
         if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM resultat LIMIT %s OFFSET %s"
+            cursor.execute(sql, (limit, offset))
+            rows = cursor.fetchall()
+            return [Resultat(**row) for row in rows]
+
+    @staticmethod
+    def get_number_row() -> int:
+        conn = get_db_connection()
+        if not conn:
             raise ConnectionError("Connexion à la base de données échouée.")
-        with connection.cursor(dictionary=True) as cursor:
-            sql = "SELECT * FROM resultat"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return [Resultat(**row) for row in result]
+
+        with conn.cursor() as cursor:
+            query = "SELECT COUNT(*) FROM resultat"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result['COUNT(*)'] if result else 0

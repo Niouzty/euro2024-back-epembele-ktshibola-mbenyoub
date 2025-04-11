@@ -1,3 +1,4 @@
+
 from models.rencontre_model import Rencontre
 from shared.db_connection import get_db_connection
 
@@ -29,23 +30,35 @@ class RencontreService:
             return cursor.rowcount > 0
 
     @staticmethod
-    def get_rencontre(id_match) -> Rencontre | None:
+    def get_rencontres(offset: int, limit: int) -> list[Rencontre]:
+        connection = get_db_connection()
+        if not connection:
+            raise ConnectionError("Échec de la connexion à la base de données.")
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM rencontre LIMIT %s OFFSET %s"
+            cursor.execute(sql, (limit, offset))
+            rows = cursor.fetchall()
+            return [Rencontre(**row) for row in rows]
+
+    @staticmethod
+    def get_rencontre(id: int) -> Rencontre | None:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
         with connection.cursor(dictionary=True) as cursor:
-            sql = "SELECT * FROM Rencontre WHERE Id_Match = %s"
-            cursor.execute(sql, (id_match,))
+            sql = "SELECT * FROM rencontre where Id_match = %s"
+            cursor.execute(sql, (id,))
             result = cursor.fetchone()
             return Rencontre(**result) if result else None
 
     @staticmethod
-    def get_all_rencontres() -> list[Rencontre]:
-        connection = get_db_connection()
-        if not connection:
+    def get_number_row() -> int:
+        conn = get_db_connection()
+        if not conn:
             raise ConnectionError("Connexion à la base de données échouée.")
-        with connection.cursor(dictionary=True) as cursor:
-            sql = "SELECT * FROM Rencontre"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return [Rencontre(**row) for row in result]
+
+        with conn.cursor() as cursor:
+            query = "SELECT COUNT(*) FROM Rencontre"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            return result['COUNT(*)'] if result else 0

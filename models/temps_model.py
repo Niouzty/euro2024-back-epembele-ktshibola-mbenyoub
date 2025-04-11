@@ -1,15 +1,14 @@
+import datetime
 
 
 class Temps:
-    def __init__(self, id_temps: int, minute: int):
+    def __init__(self, id_temps: int, date_heure_match: datetime.datetime):
         self.id_temps = id_temps
-        self.minute = minute
+        self.date_heure_match = date_heure_match
 
     def to_dict(self):
         return {
             "id_temps": self.id_temps,
-            "minute": self.minute
+            "date_heure_match": self.date_heure_match
         }
 
-    def __lt__(self, other):
-        return self.minute < other.minute

@@ -51,9 +51,19 @@ def get_nationalite(id_nationalite: int) -> tuple[Response, int]:
 @nationalite_controller.route('/', methods=['GET'])
 def get_all_nationalites() -> tuple[Response, int]:
     try:
-        nationalites = NationaliteService.get_all_nationalites()
-        if nationalites:
-            return jsonify({"result": [nationalite.to_dict() for nationalite in nationalites]}), 200
-        return jsonify({"error": "Aucune nationalité trouvée."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = NationaliteService.get_nationalites(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des nationalités. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@nationalite_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = NationaliteService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from services.arbitre_service import ArbitreService
 
-arbitre_bp = Blueprint('arbitre', __name__,'arbitres')
+arbitre_bp = Blueprint('arbitre', __name__, url_prefix='/arbitres')
+
 
 @arbitre_bp.route('/', methods=['POST'])
 def add_arbitre():
@@ -37,7 +38,7 @@ def get_arbitre(id_arbitre):
     try:
         arbitre = ArbitreService.get_arbitre(id_arbitre)
         if arbitre:
-            return jsonify({"result" : arbitre.to_dict()})
+            return jsonify({"result": arbitre.to_dict()})
         else:
             return jsonify({"erreur": "Arbitre non trouvé."}), 404
     except Exception as e:
@@ -47,8 +48,12 @@ def get_arbitre(id_arbitre):
 @arbitre_bp.route('/', methods=['GET'])
 def get_arbitres():
     try:
-        arbitres = ArbitreService.get_all_arbitres()
-        return jsonify({"result" : [arbitre.to_dict() for arbitre in arbitres]})
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        arbitres = ArbitreService.get_arbitres(offset, limit)
+
+        return jsonify({"result": [arbitre.to_dict() for arbitre in arbitres]})
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
 
@@ -58,5 +63,15 @@ def get_statistiques_arbitres():
     try:
         resultats = ArbitreService.get_all_result()
         return jsonify(resultats)
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
+
+
+@arbitre_bp.route('/nombres', methods=['GET'])
+def get_nombre_arbitres():
+    try:
+        total = ArbitreService.get_number_row()
+        return jsonify({"result": total})
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500

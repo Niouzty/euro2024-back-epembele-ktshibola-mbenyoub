@@ -46,9 +46,19 @@ def get_phase_tournoi(id_phase: int) -> tuple[Response, int]:
 @phase_tournoi_controller.route('/', methods=['GET'])
 def get_all_phases_tournoi() -> tuple[Response, int]:
     try:
-        phases_tournoi = PhaseTournoiService.get_all_phases_tournoi()
-        if phases_tournoi:
-            return jsonify(phases_tournoi), 200
-        return jsonify({"error": "Aucune phase du tournoi trouvée."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        ns = PhaseTournoiService.get_phase_tournois(offset=offset, limit=limit)
+        return jsonify({"result": [n.to_dict() for n in ns]}), 200
     except Exception as e:
-        return jsonify({"error": f"Erreur interne lors de la récupération des phases du tournoi. {e}"}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@phase_tournoi_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = PhaseTournoiService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500

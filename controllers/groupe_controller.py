@@ -47,9 +47,20 @@ def get_groupe(id_groupe: int) -> tuple[Response, int]:
 @groupe_controller.route('/', methods=['GET'])
 def get_all_groupes() -> tuple[Response, int]:
     try:
-        groupes = GroupeService.get_all_groupes()
-        if groupes:
-            return jsonify({"result": [groupe.to_dict() for groupe in groupes]}), 200
-        return jsonify({"message": "Aucun groupe trouvé."}), 404
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        gs = GroupeService.get_groupes(offset=offset, limit=limit)
+        return jsonify({"result": [g.to_dict() for g in gs]}), 200
     except Exception as e:
-        return jsonify({"message": f"Erreur interne lors de la récupération des groupes {e}."}), 500
+        return jsonify({"error": str(e)}), 500
+
+
+@groupe_controller.route('/nombres', methods=['GET'])
+def get_nombre():
+    try:
+        total = GroupeService.get_number_row()
+        return jsonify({"result": total})
+    except Exception as e:
+        return jsonify({"erreur": str(e)}), 500
+
