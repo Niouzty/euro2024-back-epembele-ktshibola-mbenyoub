@@ -14,7 +14,7 @@ class ServicesDatabase:
         query = """
         SELECT TABLE_NAME, COLUMN_NAME 
         FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_SCHEMA = 'bd_euro_2024';
+        WHERE TABLE_SCHEMA = 'euro2024';
         """
 
         with connection.cursor() as cursor:
@@ -40,7 +40,7 @@ class ServicesDatabase:
         query = """
         SELECT COLUMN_NAME 
         FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_SCHEMA = 'bd_euro_2024' AND TABLE_NAME = %s;
+        WHERE TABLE_SCHEMA = 'euro2024' AND TABLE_NAME = %s;
         """
 
         with connection.cursor() as cursor:

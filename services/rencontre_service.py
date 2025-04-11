@@ -62,3 +62,6 @@ class RencontreService:
             cursor.execute(query)
             result = cursor.fetchone()
             return result['COUNT(*)'] if result else 0
+
+
+   

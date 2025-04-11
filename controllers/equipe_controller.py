@@ -56,7 +56,6 @@ def get_all_equipes_route() -> tuple[Response, int]:
 
 
 
-
 @equipe_controller.route('/nombres', methods=['GET'])
 def get_nombre():
     try:
@@ -65,7 +64,15 @@ def get_nombre():
     except Exception as e:
         return jsonify({"erreur": str(e)}), 500
 
-
+@equipe_controller.route('/compare', methods=['GET'])
+def get_all_equipes_route_compare() -> tuple[Response, int]:
+    try:
+        equipes = EquipeService.get_all_equipes_compare()
+        if equipes:
+            return jsonify(equipes), 200  
+        return jsonify({"message": "Aucune équipe trouvée."}), 404 
+    except Exception as e:
+        return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500
 
 
 @equipe_controller.route('/compare', methods=['POST'])
@@ -80,6 +87,9 @@ def compare_teams() -> tuple[Response, int]:
 
         stats_equipe1 = EquipeService.get_all_result_by_equipe(equipe1_id)
         stats_equipe2 = EquipeService.get_all_result_by_equipe(equipe2_id)
+
+        print(stats_equipe1)
+        print(stats_equipe2)
 
         if not stats_equipe1 or not stats_equipe2:
             return jsonify({"message": "Données introuvables pour une ou plusieurs équipes."}), 404
@@ -103,27 +113,28 @@ def compare_teams() -> tuple[Response, int]:
 
         # Construction de la réponse
         response = {
-            "equipe1": {
-                "nom": e1['nom'],
-                "nombre_de_matchs": e1['nombre_de_matchs'],
-                "buts_temps_reglementaire": e1['buts_temps_reglementaire'],
-                "buts_apres_prolongation": e1['buts_apres_prolongation'],
-                "buts_tirs_au_but": e1['buts_tirs_au_but']
-            },
-            "equipe2": {
-                "nom": e2['nom'],
-                "nombre_de_matchs": e2['nombre_de_matchs'],
-                "buts_temps_reglementaire": e2['buts_temps_reglementaire'],
-                "buts_apres_prolongation": e2['buts_apres_prolongation'],
-                "buts_tirs_au_but": e2['buts_tirs_au_but']
-            },
-            "comparaison": {
-                "difference_buts_reglementaire": e1['buts_temps_reglementaire'] - e2['buts_temps_reglementaire'],
-                "difference_buts_prolongation": e1['buts_apres_prolongation'] - e2['buts_apres_prolongation'],
-                "difference_tirs_au_but": e1['buts_tirs_au_but'] - e2['buts_tirs_au_but'],
-                "difference_matchs_joues": e1['nombre_de_matchs'] - e2['nombre_de_matchs']
-            }
-        }
+    "equipe1": {
+        "nom": e1['equipe'],  # Changé 'nom' en 'equipe'
+        "nombre_de_matchs": int(e1['nombre_de_matchs']),
+        "buts_temps_reglementaire": float(e1['buts_temps_reglementaire']),
+        "buts_apres_prolongation": float(e1['buts_apres_prolongation']),
+        "buts_tirs_au_but": float(e1['buts_tirs_au_but'])
+    },
+    "equipe2": {
+        "nom": e2['equipe'],  # Changé ici aussi
+        "nombre_de_matchs": int(e2['nombre_de_matchs']),
+        "buts_temps_reglementaire": float(e2['buts_temps_reglementaire']),
+        "buts_apres_prolongation": float(e2['buts_apres_prolongation']),
+        "buts_tirs_au_but": float(e2['buts_tirs_au_but'])
+    },
+    "comparaison": {
+        "difference_buts_reglementaire": float(e1['buts_temps_reglementaire']) - float(e2['buts_temps_reglementaire']),
+        "difference_buts_prolongation": float(e1['buts_apres_prolongation']) - float(e2['buts_apres_prolongation']),
+        "difference_tirs_au_but": float(e1['buts_tirs_au_but']) - float(e2['buts_tirs_au_but']),
+        "difference_matchs_joues": int(e1['nombre_de_matchs']) - int(e2['nombre_de_matchs'])
+    }
+}
+        print(response)
         return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": f"Erreur serveur: {str(e)}"}), 500

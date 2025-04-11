@@ -54,7 +54,7 @@ class StatsJoueurService:
         connection = get_db_connection()
         if not connection:
             raise ConnectionError("Connexion à la base de données échouée.")
-        with connection.cursor(dictionary=True) as cursor:
+        with connection.cursor() as cursor:
             sql = """
             SELECT * from joueur 
             JOIN stats_joueur USING(id_stats_joueur) 
